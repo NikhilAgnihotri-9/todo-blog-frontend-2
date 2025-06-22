@@ -1,0 +1,19 @@
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.card {
+  border-radius: 1rem;
+}
+
+#task-list .list-group-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: background-color 0.3s;
+}
+
+#task-list .completed {
+  text-decoration: line-through;
+  background-color: #d1e7dd;
+}
