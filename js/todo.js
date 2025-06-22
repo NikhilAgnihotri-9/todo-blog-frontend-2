@@ -1,8 +1,8 @@
 let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
 
-const taskInput = document.getElementById("new-task");
 const taskList = document.getElementById("task-list");
-const addTaskBtn = document.getElementById("add-task-btn");
+const addBtn = document.getElementById("add-task-btn");
+const newTaskInput = document.getElementById("new-task");
 const filterButtons = document.querySelectorAll(".filter-btn");
 
 function saveTasks() {
@@ -12,39 +12,40 @@ function saveTasks() {
 function renderTasks(filter = "all") {
   taskList.innerHTML = "";
 
-  let filteredTasks = tasks.filter(task => {
-    if (filter === "completed") return task.completed;
-    if (filter === "pending") return !task.completed;
-    return true;
-  });
+  let filteredTasks = tasks;
+  if (filter === "completed") {
+    filteredTasks = tasks.filter(task => task.completed);
+  } else if (filter === "pending") {
+    filteredTasks = tasks.filter(task => !task.completed);
+  }
 
   filteredTasks.forEach((task, index) => {
     const li = document.createElement("li");
-    li.className = \`list-group-item \${task.completed ? "completed" : ""}\`;
+    li.className = "list-group-item d-flex justify-content-between align-items-center";
+    if (task.completed) li.classList.add("list-group-item-success");
 
-    li.innerHTML = \`
-      <span>\${task.text}</span>
+    li.innerHTML = `
+      <span>${task.text}</span>
       <div>
-        <button class="btn btn-sm btn-success me-2" onclick="toggleTask(\${index})">✔</button>
-        <button class="btn btn-sm btn-danger" onclick="deleteTask(\${index})">🗑</button>
+        <button class="btn btn-sm btn-success me-2" onclick="toggleComplete(${index})">✔</button>
+        <button class="btn btn-sm btn-danger" onclick="deleteTask(${index})">🗑</button>
       </div>
-    \`;
-
+    `;
     taskList.appendChild(li);
   });
 }
 
 function addTask() {
-  const text = taskInput.value.trim();
-  if (text !== "") {
-    tasks.push({ text, completed: false });
-    saveTasks();
-    taskInput.value = "";
-    renderTasks();
-  }
+  const taskText = newTaskInput.value.trim();
+  if (taskText === "") return;
+
+  tasks.push({ text: taskText, completed: false });
+  newTaskInput.value = "";
+  saveTasks();
+  renderTasks();
 }
 
-function toggleTask(index) {
+function toggleComplete(index) {
   tasks[index].completed = !tasks[index].completed;
   saveTasks();
   renderTasks();
@@ -56,12 +57,11 @@ function deleteTask(index) {
   renderTasks();
 }
 
-addTaskBtn.addEventListener("click", addTask);
-taskInput.addEventListener("keypress", e => e.key === "Enter" && addTask());
+addBtn.addEventListener("click", addTask);
 
 filterButtons.forEach(btn => {
   btn.addEventListener("click", () => {
-    filterButtons.forEach(b => b.classList.remove("active"));
+    document.querySelector(".filter-btn.active").classList.remove("active");
     btn.classList.add("active");
     renderTasks(btn.dataset.filter);
   });
